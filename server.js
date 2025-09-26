@@ -6,15 +6,14 @@ import express, { json } from 'express';
 import cors from 'cors';
 import lcaRoutes from './routes/lcaRoutes.js';
 import authRoutes from './routes/authRoutes.js';
-dotenv.config(); // Load environment variables first
+dotenv.config(); 
 
 const app = express();
-const PORT = process.env.PORT || 8000; // .env se PORT lega ya default 8000
+const PORT = process.env.PORT || 8000; 
 
-// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('📊 MongoDB connection successful'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+  .then(() => console.log('mongoDB connection successful'))
+  .catch((err) => console.error(' mongoDB connection error:', err));
 
 app.use(cors());
 app.use(json());
@@ -26,7 +25,7 @@ app.get('/', (req, res) => {
 
 
 app.use('/api/lca', lcaRoutes); 
-app.use('/api/auth', authRoutes); // Add auth routes
+app.use('/api/auth', authRoutes); 
 
 
 app.use((err, req, res, next) => {
@@ -36,7 +35,7 @@ app.use((err, req, res, next) => {
 
 
 app.listen(PORT, () => {
-    console.log(`✅ CircuMetal AI Backend server running on http://localhost:${PORT}`);
+    console.log(`CircuMetal AI Backend server running on http://localhost:${PORT}`);
     console.log(`Explore API at http://localhost:${PORT}/api/lca`);
     console.log(`Auth endpoints available at http://localhost:${PORT}/api/auth`);
 });
