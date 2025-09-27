@@ -6,6 +6,7 @@ const router = Router();
 // AI analysis endpoints
 router.post('/suggest-parameters', lcaController.suggestParameters);
 router.post('/generate-recommendations', lcaController.generateRecommendations);
+router.post('/node-insights', lcaController.getNodeInsights); // New endpoint for dynamic node insights
 
 // Report management endpoints
 router.get('/reports', lcaController.getReports);
