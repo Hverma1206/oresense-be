@@ -14,7 +14,7 @@ const generateToken = (id) => {
 // @access  Public
 export const signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
@@ -26,7 +26,8 @@ export const signup = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      password
+      password,
+      role: role || 'Guest'  // Default to Guest if not specified
     });
 
     if (user) {
@@ -34,6 +35,7 @@ export const signup = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
         token: generateToken(user._id)
       });
     } else {
@@ -61,6 +63,7 @@ export const login = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
         token: generateToken(user._id)
       });
     } else {
@@ -83,7 +86,8 @@ export const getUserProfile = async (req, res) => {
       res.json({
         _id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role
       });
     } else {
       res.status(404).json({ message: 'User not found' });
