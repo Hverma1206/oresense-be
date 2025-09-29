@@ -2,6 +2,7 @@
 
 import getGeminiResponse from '../services/geminiService.js';
 import Report from '../models/Report.js';
+import Template from '../models/Template.js';
 
 /**
  * Helper function to clean Gemini response by removing markdown code block syntax
@@ -605,12 +606,216 @@ function generateFallbackNodeInsights(nodeType, formData) {
   };
 }
 
+/**
+ * Get all templates
+ * @param {object} req - Express request object
+ * @param {object} res - Express response object
+ */
+async function getTemplates(req, res) {
+  try {
+    let query = {};
+    
+    // If user is authenticated, include user filter
+    if (req.query.userId) {
+      query.user = req.query.userId;
+    }
+    
+    // Allow filtering by category
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
+    
+    // Get templates from database
+    const templates = await Template.find(query)
+      .sort({ createdAt: -1 })
+      .select('-__v');
+      
+    res.json({
+      success: true,
+      templates
+    });
+  } catch (error) {
+    console.error("Error fetching templates:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to retrieve templates",
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Get a specific template by ID
+ * @param {object} req - Express request object
+ * @param {object} res - Express response object
+ */
+async function getTemplateById(req, res) {
+  try {
+    const template = await Template.findById(req.params.id);
+    
+    if (!template) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Template not found" 
+      });
+    }
+    
+    res.json({
+      success: true,
+      template
+    });
+  } catch (error) {
+    console.error("Error fetching template:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to retrieve template",
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Create a new template
+ * @param {object} req - Express request object
+ * @param {object} res - Express response object
+ */
+async function createTemplate(req, res) {
+  try {
+    const { name, description, category, parameters, processSteps } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Template name is required"
+      });
+    }
+    
+    // Create new template
+    const template = await Template.create({
+      name,
+      description,
+      category: category || 'custom',
+      parameters: parameters || {},
+      processSteps: processSteps || [],
+      user: req.user ? req.user._id : null,  // Associate with user if authenticated
+      createdAt: Date.now()
+    });
+    
+    res.status(201).json({
+      success: true,
+      template
+    });
+  } catch (error) {
+    console.error("Error creating template:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to create template",
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Update an existing template
+ * @param {object} req - Express request object
+ * @param {object} res - Express response object
+ */
+async function updateTemplate(req, res) {
+  try {
+    const { name, description, category, parameters, processSteps } = req.body;
+    
+    const template = await Template.findById(req.params.id);
+    if (!template) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Template not found" 
+      });
+    }
+    
+    // Check if user is authorized to update this template
+    if (req.user && template.user && template.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to update this template"
+      });
+    }
+    
+    // Update fields
+    if (name) template.name = name;
+    if (description !== undefined) template.description = description;
+    if (category) template.category = category;
+    if (parameters) template.parameters = parameters;
+    if (processSteps) template.processSteps = processSteps;
+    
+    template.updatedAt = Date.now();
+    
+    await template.save();
+    
+    res.json({
+      success: true,
+      template
+    });
+  } catch (error) {
+    console.error("Error updating template:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to update template",
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Delete a template
+ * @param {object} req - Express request object
+ * @param {object} res - Express response object
+ */
+async function deleteTemplate(req, res) {
+  try {
+    const template = await Template.findById(req.params.id);
+    
+    if (!template) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Template not found" 
+      });
+    }
+    
+    // Check if user is authorized to delete this template
+    if (req.user && template.user && template.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to delete this template"
+      });
+    }
+    
+    await template.remove();
+    
+    res.json({
+      success: true,
+      message: "Template deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting template:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to delete template",
+      error: error.message 
+    });
+  }
+}
+
 export default {
     suggestParameters,
     generateRecommendations,
-    getNodeInsights, // Add the new function to exports
+    getNodeInsights,
     getReports,
     getReportById,
     updateReport,
-    deleteReport
+    deleteReport,
+    getTemplates,
+    getTemplateById,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate
 };

@@ -14,4 +14,11 @@ router.get('/reports/:id', lcaController.getReportById);
 router.put('/reports/:id', protect, lcaController.updateReport); // Protected route
 router.delete('/reports/:id', protect, lcaController.deleteReport); // Protected route
 
+// Template management endpoints
+router.get('/templates', lcaController.getTemplates);
+router.get('/templates/:id', lcaController.getTemplateById);
+router.post('/templates', lcaController.createTemplate);
+router.put('/templates/:id', protect, lcaController.updateTemplate); // Protected route
+router.delete('/templates/:id', protect, lcaController.deleteTemplate); // Protected route
+
 export default router;

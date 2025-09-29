@@ -6,6 +6,8 @@ import express, { json } from 'express';
 import cors from 'cors';
 import lcaRoutes from './routes/lcaRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import teamRoutes from './routes/teamRoutes.js';
 dotenv.config(); 
 
 const app = express();
@@ -26,6 +28,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/lca', lcaRoutes); 
 app.use('/api/auth', authRoutes); 
+app.use('/api/users', userRoutes); 
+app.use('/api/team', teamRoutes); // Add team management routes
 
 
 app.use((err, req, res, next) => {
@@ -38,4 +42,6 @@ app.listen(PORT, () => {
     console.log(`CircuMetal AI Backend server running on http://localhost:${PORT}`);
     console.log(`Explore API at http://localhost:${PORT}/api/lca`);
     console.log(`Auth endpoints available at http://localhost:${PORT}/api/auth`);
+    console.log(`User endpoints available at http://localhost:${PORT}/api/users`);
+    console.log(`Team management endpoints available at http://localhost:${PORT}/api/team`);
 });

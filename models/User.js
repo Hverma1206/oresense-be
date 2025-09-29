@@ -26,6 +26,44 @@ const userSchema = new mongoose.Schema({
     enum: ['metallurgist', 'Guest', 'Auditor', 'admin'],
     default: 'Guest'
   },
+  phone: {
+    type: String,
+    trim: true
+  },
+  location: {
+    type: String,
+    trim: true
+  },
+  department: {
+    type: String,
+    trim: true
+  },
+  bio: {
+    type: String,
+    trim: true
+  },
+  preferences: {
+    notifications: {
+      emailAlerts: { type: Boolean, default: true },
+      pushNotifications: { type: Boolean, default: false },
+      weeklyReports: { type: Boolean, default: true },
+      projectUpdates: { type: Boolean, default: true },
+      teamNotifications: { type: Boolean, default: false }
+    },
+    display: {
+      theme: { type: String, default: 'light' },
+      language: { type: String, default: 'en' },
+      timezone: { type: String, default: 'America/Los_Angeles' },
+      dateFormat: { type: String, default: 'MM/DD/YYYY' },
+      numberFormat: { type: String, default: 'US' }
+    },
+    privacy: {
+      profileVisibility: { type: String, default: 'team' },
+      activitySharing: { type: Boolean, default: true },
+      dataSharing: { type: Boolean, default: false },
+      twoFactorAuth: { type: Boolean, default: false }
+    }
+  },
   createdAt: {
     type: Date,
     default: Date.now
